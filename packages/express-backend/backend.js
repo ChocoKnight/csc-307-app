@@ -34,6 +34,21 @@ const users = {
     ]
 };
 
+function randomUserID () {
+    let userID = "";
+
+    const characters = "abcdefghijklmnopqrstuvwxyz";
+    for(let i = 0; i < 3; i++) {
+        userID += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+
+    for(let i = 0; i < 3; i++) {
+        userID += Math.floor(Math.random() * 9);
+    }
+
+    return userID;
+}
+
 const findUserByName = (name) => {
     return users["users_list"].filter(
         (user) => user["name"] === name
@@ -56,7 +71,19 @@ const findUserById = (id) =>
     users["users_list"].find((user) => user["id"] === id);
 
 const addUser = (user) => {
+    if(!("id" in user)) {
+
+        let newUser = {
+            id: randomUserID(),
+            name: user.name,
+            job: user.job   
+        };
+
+        user = newUser  
+    } 
+
     users["users_list"].push(user);
+    
     return user;
 }
 
@@ -98,8 +125,12 @@ app.get("/users", (req, res) => {
 
 app.post("/users", (req, res) => {
     const userToAdd = req.body;
-    addUser(userToAdd);
-    res.send();
+    let newUser = addUser(userToAdd);
+    if (newUser === undefined) {
+        res.status(404).send("Resource not found.");
+    } else {
+        res.status(201).send(JSON.stringify(newUser));
+    }
 });
 
 app.get("/users/:id", (req, res) => {
@@ -119,7 +150,7 @@ app.delete("/users/:id", (req, res) => {
         res.status(404).send("Resource not found.");
     } else {
         deleteUser(id);
-        res.send();
+        res.status(204).send();
     }
 });
 
