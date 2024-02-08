@@ -8,7 +8,7 @@ function MyApp() {
 
     function removeOneCharacter(index) {
 
-        let userId = characters[index]["id"]
+        let userId = characters[index]["_id"]
 
         deleteUser(userId)
             .then((res) => {
@@ -25,18 +25,14 @@ function MyApp() {
         postUser(person)
             .then((res) => {
                 if(res.status === 201) {
-
                     res.json().then((data) => {
                         let newUser = {
-                            id: data.id,
+                            _id: data._id,
                             name: data.name,
                             job: data.job
                         }
-
                         setCharacters([...characters, newUser])
                     })
-
-                    
                 }
             })
             .catch((error) => {

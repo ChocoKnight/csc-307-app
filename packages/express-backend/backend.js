@@ -1,6 +1,6 @@
 import express from "express"
 import cors from "cors";
-import userServices from "./user-services";
+import userServices from "./user-services.js";
 
 const app = express();
 const port = 8000;
@@ -103,56 +103,65 @@ app.get("/", (req, res) => {
 app.get("/users", (req, res) => {
     const name = req.query.name;
     const job = req.query.job;
-    
-    if (name != undefined && job != undefined) {
-        let result = findUserByNameAndJob(name, job);
-        result = { users_list: result };
-        res.send(result);
-    }
-    else if (name != undefined) {
-        let result = findUserByName(name);
-        result = { users_list: result };
-        res.send(result);
-    } 
-    else if (job != undefined) {
-        let result = findUserByJob(job);
-        result = { users_list: result };
-        res.send(result);
-    }
-    else {
-        res.send(users);
-    }
+
+    userServices.getUsers(name, job)
+    .then((users) => {
+        // console.log(users)
+        const userList = Array.isArray(users) ? users : [users];
+        res.send({ users_list: userList })
+    })
+    .catch((error) => {
+        console.log(error)
+    });
 });
 
 app.post("/users", (req, res) => {
     const userToAdd = req.body;
-    let newUser = addUser(userToAdd);
-    if (newUser === undefined) {
+
+    userServices.addUser(userToAdd)
+    .then((user) => {
+        res.status(201).send(JSON.stringify(user));
+    })
+    .catch((error) => {
+        console.log(error)
         res.status(404).send("Resource not found.");
-    } else {
-        res.status(201).send(JSON.stringify(newUser));
-    }
+    });
 });
 
 app.get("/users/:id", (req, res) => {
     const id = req.params["id"]; //or req.params.id
-    let result = findUserById(id);
-    if (result === undefined) {
-        res.status(404).send("Resource not found.");
-    } else {
-        res.send(result);
-    }
+
+    userServices.findUserById(id)
+    .then((user) => {
+        const userList = Array.isArray(user) ? user : [user];
+        res.send({ users_list: userList })
+    })
+    .catch((error) => {
+        console.log(error)
+    });
 });
 
 app.delete("/users/:id", (req, res) => {
     const id = req.params["id"]; //or req.params.id
-    let result = findUserById(id);
-    if (result === undefined) {
-        res.status(404).send("Resource not found.");
-    } else {
-        deleteUser(id);
-        res.status(204).send();
-    }
+    console.log(id)
+    userServices.deleteUser(id)
+    .then((data) => {
+        console.log(data)
+        if(data) {
+            res.status(204).send();
+        }
+    })
+    .catch((error) => {
+        console.log(error)
+    });
+
+    // let result = findUserById(id);
+    // if (result === undefined) {
+    //     res.status(404).send("Resource not found.");
+    // } else {
+    //     deleteUser(id);
+    //     res.status(204).send();
+    // }
 });
 
 app.listen(port, () => {

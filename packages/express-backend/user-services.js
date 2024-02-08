@@ -1,43 +1,57 @@
 import mongoose from "mongoose";
-import userModel from "./user";
+import userModel from "./user.js";
 
 mongoose.set("debug", true);
 
 mongoose
-  .connect("mongodb://localhost:27017/users", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .catch((error) => console.log(error));
+    .connect("mongodb://localhost:27017/users", {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    })
+    .catch((error) => console.log(error));
+
+function addUser(user) {
+    const userToAdd = new userModel(user);
+    const promise = userToAdd.save();
+    return promise;
+}
+
+function deleteUser(userID) {
+    let promise;
+    if(userID != undefined) {
+        promise = userModel.findByIdAndDelete(userID)
+    } 
+    return promise;
+}
 
 function getUsers(name, job) {
-  let promise;
-  if (name === undefined && job === undefined) {
-    promise = userModel.find();
-  } else if (name && !job) {
-    promise = findUserByName(name);
-  } else if (job && !name) {
-    promise = findUserByJob(job);
-  }
-  return promise;
+    let promise;
+    if (name === undefined && job === undefined) {
+        promise = userModel.find();
+    } else if (name && !job) {
+        promise = findUserByName(name);
+    } else if (job && !name) {
+        promise = findUserByJob(job);
+    } else if (job && name) {
+        promise = findUserByNameAndJob(name, job)
+    }
+    return promise;
 }
 
 function findUserById(id) {
-  return userModel.findById(id);
-}
-
-function addUser(user) {
-  const userToAdd = new userModel(user);
-  const promise = userToAdd.save();
-  return promise;
+    return userModel.findById(id);
 }
 
 function findUserByName(name) {
-  return userModel.find({ name: name });
+    return userModel.find({ name: name });
 }
 
 function findUserByJob(job) {
-  return userModel.find({ job: job });
+    return userModel.find({ job: job });
+}
+
+function findUserByNameAndJob(name, job){
+    return userModel.find({ name: name, job: job });
 }
 
 export default {
@@ -46,4 +60,5 @@ export default {
   findUserById,
   findUserByName,
   findUserByJob,
+  deleteUser,
 };
