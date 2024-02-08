@@ -5,36 +5,6 @@ import userServices from "./user-services.js";
 const app = express();
 const port = 8000;
 
-// const users = {
-//     users_list: [
-//         {
-//             id: "xyz789",
-//             name: "Charlie",
-//             job: "Janitor"
-//         },
-//         {
-//             id: "abc123",
-//             name: "Mac",
-//             job: "Bouncer"
-//         },
-//         {
-//             id: "ppp222",
-//             name: "Mac",
-//             job: "Professor"
-//         },
-//         {
-//             id: "yat999",
-//             name: "Dee",
-//             job: "Aspring actress"
-//         },
-//         {
-//             id: "zap555",
-//             name: "Dennis",
-//             job: "Bartender"
-//         }
-//     ]
-// };
-
 function randomUserID () {
     let userID = "";
 
@@ -48,48 +18,6 @@ function randomUserID () {
     }
 
     return userID;
-}
-
-const findUserByName = (name) => {
-    return users["users_list"].filter(
-        (user) => user["name"] === name
-    );
-};
-
-const findUserByJob = (job) => {
-    return users["users_list"].filter(
-        (user) => user["job"] === job
-    );
-}
-
-const findUserByNameAndJob = (name, job) => {
-    return users["users_list"].filter(
-        (user) => user["name"] === name && user["job"] === job
-    );
-}
-
-const findUserById = (id) => 
-    users["users_list"].find((user) => user["id"] === id);
-
-const addUser = (user) => {
-    if(!("id" in user)) {
-
-        let newUser = {
-            id: randomUserID(),
-            name: user.name,
-            job: user.job   
-        };
-
-        user = newUser  
-    } 
-
-    users["users_list"].push(user);
-    
-    return user;
-}
-
-const deleteUser = (id) => {
-    users["users_list"].splice(users["users_list"].findIndex((user) => user["id"] === id), 1); 
 }
 
 app.use(cors());
@@ -154,14 +82,6 @@ app.delete("/users/:id", (req, res) => {
     .catch((error) => {
         console.log(error)
     });
-
-    // let result = findUserById(id);
-    // if (result === undefined) {
-    //     res.status(404).send("Resource not found.");
-    // } else {
-    //     deleteUser(id);
-    //     res.status(204).send();
-    // }
 });
 
 app.listen(port, () => {
